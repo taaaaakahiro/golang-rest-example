@@ -16,7 +16,7 @@ func Run() {
 }
 
 func run(ctx context.Context) int {
-	fmt.Println(44444)
+	fmt.Println("Hello World")
 
 	return exitOK
 }
