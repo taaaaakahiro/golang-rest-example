@@ -1,0 +1,18 @@
+services:
+  # MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_host_for_golang
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: example
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+    # - ./docker/db/data:/var/lib/mysql
+    # - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./mock/ddl:/docker-entrypoint-initdb.d
+    ports:
+      - 33061:3306
