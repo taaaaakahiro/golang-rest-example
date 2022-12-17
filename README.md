@@ -22,10 +22,14 @@ export PORT=<server port>
 export MYSQL_DSN=<mysql dsn>
 export ALLOW_CORS_ORIGIN=<cors origin>
 ```
-
 2. command
 ```sh
 $ make run
+```
+3. check endpoint
+```
+localhost:<SERVER PORT>/version
+localhost:<SERVER PORT>/healthz
 ```
 
 # test
