@@ -3,7 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 )
 
 const (
@@ -16,7 +19,11 @@ func Run() {
 }
 
 func run(ctx context.Context) int {
-	fmt.Println("Hello World")
+	logger := log.Default()
+	logger.Print("Run App")
+
+	cnf := config.LoadCofig()
+	fmt.Print(cnf.Port)
 
 	return exitOK
 }
