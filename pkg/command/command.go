@@ -23,7 +23,8 @@ func run(ctx context.Context) int {
 	logger.Print("Run App")
 
 	cnf := config.LoadCofig()
-	fmt.Print(cnf.Port)
+	fmt.Println(cnf.Port)
+	fmt.Println(cnf.Dsn)
 
 	return exitOK
 }
