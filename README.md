@@ -15,7 +15,7 @@ $ docker-compose up -d # run
 $ docker-compose down # down
 ```
 
-# run app
+# run app ex) .env.sample
 1. setup env
 ```
 export PORT=<server port>
