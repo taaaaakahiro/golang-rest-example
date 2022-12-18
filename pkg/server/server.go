@@ -55,6 +55,11 @@ func (s *Server) GracefulShutdown(ctx context.Context) error {
 }
 
 func (s *Server) registerHandler(env *config.Config, cnf *Config) {
+
+	// v1
+	// sr := s.Router.PathPrefix("/v1")
+	// sr.HandlerFunc("/reviews",listReviewsHandler)
+
 	// common
 	s.Router.HandleFunc("/healthz", s.healthCheckHandler).Methods(http.MethodGet)
 	s.Router.HandleFunc("/version", s.handler.Version.GetVersion).Methods(http.MethodGet)
