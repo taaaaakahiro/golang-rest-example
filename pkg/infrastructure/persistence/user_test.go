@@ -9,15 +9,17 @@ import (
 	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
 )
 
+const userTable = "users"
+
 func TestUserRepository_GetUser(t *testing.T) {
 	db, _ := sql.Open("mysql", mysqlDsn)
 
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{"users"}); err != nil {
+	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{"users"}); err != nil {
+		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -29,8 +31,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}{
 		{Id: 1, Name: "user1"},
 		{Id: 2, Name: "user2"},
-		{Id: 3, Name: "user3"},
-		{Id: 4, Name: "user4"},
 	}
 
 	for _, user := range users {
