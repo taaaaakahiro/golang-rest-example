@@ -16,7 +16,7 @@ $ docker-compose down # down
 ```
 
 # run app
-1. setup env
+1. setup environment
 ```
 export PORT=<server port>
 export MYSQL_DSN=<mysql dsn>
