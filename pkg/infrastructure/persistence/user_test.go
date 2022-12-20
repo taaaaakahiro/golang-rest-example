@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"context"
 	"database/sql"
 	"testing"
 
@@ -26,11 +27,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 	// Fixture
 	users := []struct {
-		Id   int
+		Id   string
 		Name string
 	}{
-		{Id: 1, Name: "user1"},
-		{Id: 2, Name: "user2"},
+		{Id: "1", Name: "user1"},
+		{Id: "2", Name: "user2"},
 	}
 
 	for _, user := range users {
@@ -42,37 +43,38 @@ func TestUserRepository_GetUser(t *testing.T) {
 	// TestCase
 	tests := []struct {
 		name    string
-		userID  int
+		userID  string
 		want    *entity.User
 		wantErr error
 	}{
 		{
 			name:   "ok",
-			userID: 1,
+			userID: "1",
 			want: &entity.User{
-				ID: 1, Name: "user1",
+				ID: "1", Name: "user1",
 			},
 			wantErr: nil,
 		},
 		{
 			name:   "ok",
-			userID: 2,
+			userID: "2",
 			want: &entity.User{
-				ID: 2, Name: "user2",
+				ID: "2", Name: "user2",
 			},
 			wantErr: nil,
 		},
 		{
 			name:    "notExistUserId",
-			userID:  999,
+			userID:  "999",
 			want:    nil,
 			wantErr: nil,
 		},
 	}
 
 	for _, tt := range tests {
+		c := context.Background()
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := userRepo.GetUser(tt.userID)
+			got, err := userRepo.GetUser(c, tt.userID)
 			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}

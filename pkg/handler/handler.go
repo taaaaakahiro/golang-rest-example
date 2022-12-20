@@ -14,7 +14,7 @@ type Handler struct {
 
 func NewHandler(logger *zap.Logger, repo *persistence.Repositories, ver string) *Handler {
 	return &Handler{
-		V1:      v1.NewHandler(repo),
+		V1:      v1.NewHandler(logger, repo),
 		Version: version.NewHandler(logger.Named("version"), ver),
 	}
 }

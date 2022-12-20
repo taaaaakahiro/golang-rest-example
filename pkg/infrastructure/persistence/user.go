@@ -1,6 +1,7 @@
 package persistence
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
@@ -20,7 +21,7 @@ func NewUserRepository(db *io.SQLDatabase) *UserRepository {
 	}
 }
 
-func (r *UserRepository) GetUser(userID int) (*entity.User, error) {
+func (r *UserRepository) GetUser(ctx context.Context, userID string) (*entity.User, error) {
 	query := `
 		SELECT
 			id,
@@ -35,7 +36,7 @@ func (r *UserRepository) GetUser(userID int) (*entity.User, error) {
 		return nil, err
 	}
 	var user entity.User
-	err = stmtOut.QueryRow(userID).Scan(&user.ID, &user.Name)
+	err = stmtOut.QueryRowContext(ctx, userID).Scan(&user.ID, &user.Name)
 	if err != nil {
 		switch err {
 		case sql.ErrNoRows:

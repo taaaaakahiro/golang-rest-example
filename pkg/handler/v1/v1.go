@@ -1,12 +1,16 @@
 package v1
 
-import "github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
+import (
+	"github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
+	"go.uber.org/zap"
+)
 
 type Handler struct {
-	repo *persistence.Repositories
+	logger *zap.Logger
+	repo   *persistence.Repositories
 }
 
-func NewHandler(repo *persistence.Repositories) *Handler {
+func NewHandler(logger *zap.Logger, repo *persistence.Repositories) *Handler {
 	return &Handler{
 		repo: repo,
 	}

@@ -36,3 +36,8 @@ localhost:<SERVER PORT>/healthz
 ```
 $ make test
 ```
+
+# http request
+```
+$ curl -X GET localhost:8080/v1/user/{id} -H "Content-Type: application/json"
+```

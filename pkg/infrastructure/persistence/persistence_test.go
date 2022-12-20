@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 	db, _ := io.NewDatabase(sqlSetting)
 	// repo
 	r, _ := NewRepositories(db)
-	userRepo = r.UserRepository
+	userRepo = r.User
 
 	res := m.Run()
 	// after

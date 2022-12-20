@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -15,10 +16,17 @@ import (
 
 var (
 	testServer *httptest.Server
+	mysqlDsn   string
 )
+
+const dbname = "example"
 
 func TestMain(m *testing.M) {
 	// before
+	mysqlDsn = fmt.Sprintf(
+		"root:password@tcp(localhost:33061)/%s?charset=utf8&parseTime=true",
+		dbname,
+	)
 	logger, _ := zap.NewDevelopment()
 	cfg, _ := config.LoadConfig(context.Background())
 	sqlSetting := &config.SQLDBSettings{

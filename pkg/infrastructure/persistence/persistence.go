@@ -5,15 +5,15 @@ import (
 )
 
 type Repositories struct {
-	db               *io.SQLDatabase
-	UserRepository   *UserRepository
-	ReviewRepository *ReviewRepository
+	db     *io.SQLDatabase
+	User   *UserRepository
+	Review *ReviewRepository
 }
 
 func NewRepositories(db *io.SQLDatabase) (*Repositories, error) {
 	return &Repositories{
-		db:               db,
-		UserRepository:   NewUserRepository(db),
-		ReviewRepository: NewReviewRepository(db),
+		db:     db,
+		User:   NewUserRepository(db),
+		Review: NewReviewRepository(db),
 	}, nil
 }
