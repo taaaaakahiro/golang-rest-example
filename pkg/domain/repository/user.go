@@ -8,4 +8,5 @@ import (
 
 type IUserRepository interface {
 	GetUser(ctx context.Context, userID string) (*entity.User, error)
+	CreateUser(ctx context.Context, name string) (*int, error)
 }

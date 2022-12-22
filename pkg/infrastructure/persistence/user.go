@@ -48,3 +48,26 @@ func (r *UserRepository) GetUser(ctx context.Context, userID string) (*entity.Us
 
 	return &user, nil
 }
+
+func (r *UserRepository) CreateUser(ctx context.Context, name string) (*int, error) {
+	query := `
+INSERT INTO
+	users (name)
+VALUE (?)
+	`
+	stmtOut, err := r.database.Database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	result, err := stmtOut.ExecContext(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	affect, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	af := int(affect)
+
+	return &af, nil
+}
