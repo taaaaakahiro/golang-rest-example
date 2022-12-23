@@ -71,3 +71,48 @@ VALUE (?)
 
 	return &af, nil
 }
+
+func (r *UserRepository) UpdateUser(ctx context.Context, userID string, name string) error {
+	query := `
+UPDATE
+	users
+SET
+	name = ?
+WHERE
+	id = ?
+	`
+	stmtOut, err := r.database.Database.Prepare(query)
+	if err != nil {
+		return err
+	}
+	result, err := stmtOut.ExecContext(ctx, name, userID)
+	if err != nil {
+		return err
+	}
+	_, err = result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (r *UserRepository) DeleteUser(ctx context.Context, userID string) error {
+	query := `
+DELETE FROM
+	users
+WHERE
+	id = ?
+	`
+	stmtOut, err := r.database.Database.Prepare(query)
+	if err != nil {
+		return err
+	}
+	result, err := stmtOut.ExecContext(ctx, userID)
+	if err != nil {
+		return err
+	}
+	_, err = result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	return nil
+}
