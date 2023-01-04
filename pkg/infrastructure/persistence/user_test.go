@@ -2,7 +2,6 @@ package persistence
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -14,14 +13,13 @@ import (
 const userTable = "users"
 
 func TestUserRepository_GetUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
 
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -36,7 +34,7 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}
 
 	for _, user := range users {
-		if err := testfixtures.InsertTable(db, "users", interface{}(user)); err != nil {
+		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
 			t.Errorf("insert error: %s\n", err.Error())
 		}
 	}
@@ -88,14 +86,13 @@ func TestUserRepository_GetUser(t *testing.T) {
 }
 
 func TestUserRepository_CreateUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
 
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -131,7 +128,7 @@ func TestUserRepository_CreateUser(t *testing.T) {
 			id, err := userRepo.CreateUser(c, tt.args)
 			var got *entity.User
 			if err == nil {
-				stmtOut, err := db.Prepare("select id, name from users where id = ?")
+				stmtOut, err := testDB.Prepare("select id, name from users where id = ?")
 				assert.NoError(t, err)
 				var user entity.User
 				err = stmtOut.QueryRow(*id).Scan(&user.ID, &user.Name)
@@ -150,8 +147,6 @@ func TestUserRepository_CreateUser(t *testing.T) {
 }
 
 func TestUserRepository_UpdateUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
-
 	// Fixture
 	users := []struct {
 		Id   string
@@ -207,18 +202,18 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 
 		t.Cleanup(func() {
-			if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+			if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 				t.Errorf("truncate error: %s\n", err.Error())
 			}
 		})
 
 		for _, user := range users {
-			if err := testfixtures.InsertTable(db, "users", interface{}(user)); err != nil {
+			if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
 				t.Errorf("insert error: %s\n", err.Error())
 			}
 		}
@@ -228,7 +223,7 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 			err := userRepo.UpdateUser(c, tt.args.userID, tt.args.name)
 			var got *entity.User
 			if err == nil {
-				stmtOut, _ := db.Prepare("select id, name from users where id = ?")
+				stmtOut, _ := testDB.Prepare("select id, name from users where id = ?")
 				var user entity.User
 				_ = stmtOut.QueryRowContext(c, tt.args.userID).Scan(&user.ID, &user.Name)
 				got = &user
@@ -245,8 +240,6 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 }
 
 func TestUserRepository_DeleteUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
-
 	// Fixture
 	users := []struct {
 		Id   string
@@ -278,18 +271,18 @@ func TestUserRepository_DeleteUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 
 		t.Cleanup(func() {
-			if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+			if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 				t.Errorf("truncate error: %s\n", err.Error())
 			}
 		})
 
 		for _, user := range users {
-			if err := testfixtures.InsertTable(db, "users", interface{}(user)); err != nil {
+			if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
 				t.Errorf("insert error: %s\n", err.Error())
 			}
 		}
@@ -299,7 +292,7 @@ func TestUserRepository_DeleteUser(t *testing.T) {
 			err := userRepo.DeleteUser(c, tt.userID)
 			var got *entity.User
 			if err == nil {
-				stmtOut, _ := db.Prepare("select id, name from users where id = ?")
+				stmtOut, _ := testDB.Prepare("select id, name from users where id = ?")
 				var user entity.User
 				_ = stmtOut.QueryRowContext(c, tt.userID).Scan(&user.ID)
 				got = &user

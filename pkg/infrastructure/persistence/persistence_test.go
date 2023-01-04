@@ -2,7 +2,9 @@ package persistence
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -14,7 +16,7 @@ const dbname = "example"
 
 var (
 	userRepo *UserRepository
-	mysqlDsn string
+	testDB   *sql.DB
 )
 
 func TestMain(m *testing.M) {
@@ -27,10 +29,15 @@ func TestMain(m *testing.M) {
 		SqlMaxIdleConns:     cfg.DB.MaxIdleConns,
 		SqlConnsMaxLifetime: cfg.DB.ConnsMaxLifetime,
 	}
-	mysqlDsn = fmt.Sprintf(
+	mysqlDsn := fmt.Sprintf(
 		"root:password@tcp(localhost:33061)/%s?charset=utf8&parseTime=true",
 		dbname,
 	)
+	testDB, _ = sql.Open("mysql", mysqlDsn)
+	if err := testDB.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
 	// db
 	db, _ := io.NewDatabase(sqlSetting)
 	// repo
