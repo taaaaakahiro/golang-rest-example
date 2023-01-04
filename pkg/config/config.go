@@ -14,7 +14,7 @@ type Config struct {
 
 type serverConfig struct {
 	Port            int    `env:"PORT,required"`
-	AllowCorsOrigin string `env:"ALLOW_CORS_ORIGIN,required"`
+	AllowCorsOrigin string `env:"ALLOW_CORS_ORIGIN,default=*"`
 }
 
 type databaseConfig struct {
