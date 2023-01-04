@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/middleware"
 	"go.uber.org/zap"
 )
 
@@ -58,7 +59,10 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 
 	// v1
 	sr := s.Router.PathPrefix("/v1").Subrouter()
-	sr.Handle("/user/{id}", s.handler.V1.GetUserHandler()).Methods(http.MethodGet)
+	{
+		sr.Use(mux.CORSMethodMiddleware(s.Router), middleware.CORSHeaderMiddleware(env))
+		sr.Handle("/user/{id}", s.handler.V1.GetUserHandler()).Methods(http.MethodGet)
+	}
 
 	// common
 	s.Router.HandleFunc("/healthz", s.healthCheckHandler).Methods(http.MethodGet)
