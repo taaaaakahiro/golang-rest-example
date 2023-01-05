@@ -13,7 +13,7 @@ func CORSHeaderMiddleware(cfg *config.Config) mux.MiddlewareFunc {
 			allowOrigin := cfg.Server.AllowCorsOrigin
 
 			w.Header().Set("Access-Control-Allow-Origin", allowOrigin)
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 
 			if req.Method == http.MethodOptions {
