@@ -3,19 +3,20 @@ package v1
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/input"
 
 	"go.uber.org/zap"
 )
 
 func (h *Handler) GetUserHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.Background()
 		vars := mux.Vars(r)
 		id := vars["id"]
-		user, err := h.repo.User.GetUser(ctx, id)
+		user, err := h.repo.User.GetUser(context.Background(), id)
 		if err != nil {
 			h.logger.Error("failed to get user", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -31,5 +32,39 @@ func (h *Handler) GetUserHandler() http.Handler {
 		w.WriteHeader(http.StatusOK)
 		w.Write(b)
 	})
+}
 
+func (h *Handler) PostUserHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		var user input.User
+		decode := json.NewDecoder(req.Body)
+		err := decode.Decode(&user)
+		if err != nil {
+			log.Printf("failed to decode (error:%s)", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		rowAffect, err := h.repo.User.CreateUser(context.Background(), user.Name)
+		if err != nil {
+			log.Printf("failed to create user (error:%s)", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if *rowAffect != 1 {
+			log.Printf("user is conflict")
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
+
+		byte, err := json.Marshal(user)
+		if err != nil {
+			log.Printf("failed to marshal user (error:%s)", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write(byte)
+	})
 }
