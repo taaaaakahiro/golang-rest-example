@@ -63,13 +63,13 @@ VALUE (?)
 	if err != nil {
 		return nil, err
 	}
-	affect, err := result.LastInsertId()
+	insertID, err := result.LastInsertId()
 	if err != nil {
 		return nil, err
 	}
-	af := int(affect)
+	id := int(insertID)
 
-	return &af, nil
+	return &id, nil
 }
 
 func (r *UserRepository) UpdateUser(ctx context.Context, userID string, name string) error {

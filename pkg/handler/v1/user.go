@@ -45,13 +45,14 @@ func (h *Handler) PostUserHandler() http.Handler {
 			return
 		}
 
-		rowAffect, err := h.repo.User.CreateUser(context.Background(), user.Name)
+		id, err := h.repo.User.CreateUser(context.Background(), user.Name)
 		if err != nil {
 			log.Printf("failed to create user (error:%s)", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if *rowAffect != 1 {
+
+		if *id == 0 {
 			log.Printf("user is conflict")
 			w.WriteHeader(http.StatusConflict)
 			return
