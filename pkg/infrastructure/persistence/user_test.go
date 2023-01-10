@@ -13,7 +13,6 @@ import (
 const userTable = "users"
 
 func TestUserRepository_GetUser(t *testing.T) {
-
 	// CleanUp
 	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
@@ -74,6 +73,66 @@ func TestUserRepository_GetUser(t *testing.T) {
 		c := context.Background()
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := userRepo.GetUser(c, tt.userID)
+			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestUserRepository_ListUsers(t *testing.T) {
+	// CleanUp
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+		t.Errorf("truncate error: %s\n", err.Error())
+	}
+	t.Cleanup(func() {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+	})
+
+	// Fixture
+	users := []struct {
+		Id   string
+		Name string
+	}{
+		{Id: "1", Name: "user1"},
+		{Id: "2", Name: "user2"},
+		{Id: "3", Name: "user3"},
+	}
+
+	for _, user := range users {
+		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
+			t.Errorf("insert error: %s\n", err.Error())
+		}
+	}
+
+	// TestCase
+	tests := []struct {
+		name    string
+		userID  string
+		want    []*entity.User
+		wantErr error
+	}{
+		{
+			name:   "ok",
+			userID: "1",
+			want: []*entity.User{
+				{ID: "1", Name: "user1"},
+				{ID: "2", Name: "user2"},
+				{ID: "3", Name: "user3"},
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		c := context.Background()
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := userRepo.ListUsers(c)
 			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}

@@ -49,6 +49,39 @@ func (r *UserRepository) GetUser(ctx context.Context, userID string) (*entity.Us
 	return &user, nil
 }
 
+func (r *UserRepository) ListUsers(ctx context.Context) ([]*entity.User, error) {
+	query := `
+		SELECT
+			id,
+			name
+		FROM
+			users
+	`
+	stmtOut, err := r.database.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmtOut.QueryContext(ctx)
+	if err != nil {
+		return []*entity.User{}, err
+	}
+
+	users := make([]*entity.User, 0)
+	for rows.Next() {
+		var user entity.User
+		err = rows.Scan(&user.ID, &user.Name)
+		if err != nil {
+			return []*entity.User{}, err
+		}
+		users = append(users, &user)
+	}
+	if err = rows.Err(); err != nil {
+		return []*entity.User{}, err
+	}
+
+	return users, nil
+}
+
 func (r *UserRepository) CreateUser(ctx context.Context, name string) (*int, error) {
 	query := `
 INSERT INTO
@@ -95,6 +128,7 @@ WHERE
 	}
 	return nil
 }
+
 func (r *UserRepository) DeleteUser(ctx context.Context, userID string) error {
 	query := `
 DELETE FROM
