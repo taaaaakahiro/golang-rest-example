@@ -34,6 +34,26 @@ func (h *Handler) GetUserHandler() http.Handler {
 	})
 }
 
+func (h *Handler) ListUsersHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		users, err := h.repo.User.ListUsers(context.Background())
+		if err != nil {
+			h.logger.Error("failed to get user", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		b, err := json.Marshal(users)
+		if err != nil {
+			h.logger.Error("marshal error", zap.Error(err))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(b)
+	})
+}
+
 func (h *Handler) PostUserHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		var user input.User

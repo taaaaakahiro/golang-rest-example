@@ -62,6 +62,7 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 	{
 		sr.Use(mux.CORSMethodMiddleware(s.Router), middleware.CORSHeaderMiddleware(env))
 		sr.Handle("/user/{id}", s.handler.V1.GetUserHandler()).Methods(http.MethodGet, http.MethodOptions)
+		sr.Handle("/users", s.handler.V1.ListUsersHandler()).Methods(http.MethodGet, http.MethodOptions)
 		sr.Handle("/user", s.handler.V1.PostUserHandler()).Methods(http.MethodPost, http.MethodOptions)
 	}
 
