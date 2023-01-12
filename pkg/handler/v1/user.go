@@ -89,3 +89,18 @@ func (h *Handler) PostUserHandler() http.Handler {
 		w.Write(byte)
 	})
 }
+
+func (h *Handler) DeleteUserHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		id := vars["id"]
+		err := h.repo.User.DeleteUser(context.Background(), id)
+		if err != nil {
+			log.Printf("failed to create user (error:%s)", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+}
