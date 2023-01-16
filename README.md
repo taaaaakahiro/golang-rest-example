@@ -33,12 +33,12 @@ $ localhost:<SERVER PORT>/version #ex. localhost:8080/version
 $ localhost:<SERVER PORT>/healthz
 ```
 
-# test ~goでテストを実行~
+# test *goでテストを実行
 ```sh
 $ make test #go test ./...
 ```
 
-# http request
+# curl/http request
 ```sh
 $ curl -X GET localhost:8080/version #バージョン確認(動作確認も兼ねています)
 $ curl -X GET localhost:8080/v1/user/{id} -H "Content-Type: application/json" #idを指定して該当のuserを取得
@@ -47,3 +47,5 @@ $ curl -X POST localhost:8080/v1/user -H "Content-Type: application/json" --data
 $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json" #idを指定して該当のuserをテーブルから削除
 
 ```
+ - 画面キャプチャ
+    https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3
