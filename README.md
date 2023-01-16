@@ -9,13 +9,13 @@ docker-compose version 1.29.2, build 5becea4c
 # setup
 
 
-## run DB ~DBコンテナを起動~
+## run DB *DBコンテナを起動
 ```sh
 $ docker-compose up -d #コンテナ起動
 $ docker-compose down #コンテナ停止
 ```
 
-## run app ~api serverを起動~
+## run app *api serverを起動
 1. setup environment/環境変数を設定
 ```sh
 $ export PORT=<server port>
