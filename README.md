@@ -7,16 +7,20 @@ docker-compose version 1.29.2, build 5becea4c
 ```
 
 # setup
-
+## isntall golang & docker
+   - go
+      - https://go.dev/
+   - docker desktop
+      - https://www.docker.com/products/docker-desktop/
 
 ## run DB *DBコンテナを起動
 ```sh
-$ docker-compose up -d #コンテナ起動
-$ docker-compose down #コンテナ停止
+$ docker-compose up -d #DBコンテナ起動
+$ docker-compose down #DBコンテナ停止
 ```
 
 ## run app *api serverを起動
-1. setup environment/環境変数を設定
+1. setup environment/環境変数を設定(内容は.env.sampleファイル参照)
 ```sh
 $ export PORT=<server port>
 $ export MYSQL_DSN=<mysql dsn>
@@ -32,6 +36,11 @@ $ make run #go run ./cmd/api/main.go
 $ localhost:<SERVER PORT>/version #ex. localhost:8080/version
 $ localhost:<SERVER PORT>/healthz
 ```
+- 画面キャプチャ
+   - /version
+      - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D--version
+   - /healthz
+      - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D-healthz
 
 # test *goでテストを実行
 ```sh
@@ -47,5 +56,5 @@ $ curl -X POST localhost:8080/v1/user -H "Content-Type: application/json" --data
 $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json" #idを指定して該当のuserをテーブルから削除
 
 ```
- - 画面キャプチャ
-    https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3
+   - 画面キャプチャ
+      - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3
