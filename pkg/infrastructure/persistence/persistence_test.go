@@ -15,8 +15,9 @@ import (
 const dbname = "example"
 
 var (
-	userRepo *UserRepository
-	testDB   *sql.DB
+	userRepo   *UserRepository
+	reviewRepo *ReviewRepository
+	testDB     *sql.DB
 )
 
 func TestMain(m *testing.M) {
@@ -42,7 +43,8 @@ func TestMain(m *testing.M) {
 	db, _ := io.NewDatabase(sqlSetting)
 	// repo
 	r, _ := NewRepositories(db)
-	userRepo = r.User
+	userRepo = r.UserRepository
+	reviewRepo = r.ReviewRepository
 
 	res := m.Run()
 	// after
