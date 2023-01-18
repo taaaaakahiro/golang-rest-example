@@ -16,7 +16,7 @@ func (h *Handler) GetUserHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		user, err := h.repo.User.GetUser(context.Background(), id)
+		user, err := h.repo.UserRepository.GetUser(context.Background(), id)
 		if err != nil {
 			h.logger.Error("failed to get user", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -36,7 +36,7 @@ func (h *Handler) GetUserHandler() http.Handler {
 
 func (h *Handler) ListUsersHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		users, err := h.repo.User.ListUsers(context.Background())
+		users, err := h.repo.UserRepository.ListUsers(context.Background())
 		if err != nil {
 			h.logger.Error("failed to get user", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -65,7 +65,7 @@ func (h *Handler) PostUserHandler() http.Handler {
 			return
 		}
 
-		id, err := h.repo.User.CreateUser(context.Background(), user.Name)
+		id, err := h.repo.UserRepository.CreateUser(context.Background(), user.Name)
 		if err != nil {
 			log.Printf("failed to create user (error:%s)", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -94,7 +94,7 @@ func (h *Handler) DeleteUserHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		id := vars["id"]
-		err := h.repo.User.DeleteUser(context.Background(), id)
+		err := h.repo.UserRepository.DeleteUser(context.Background(), id)
 		if err != nil {
 			log.Printf("failed to create user (error:%s)", err)
 			w.WriteHeader(http.StatusInternalServerError)
