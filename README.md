@@ -59,7 +59,7 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
    - 画面キャプチャ
       - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3
 
-# Architecture/ディレクト構成
+# Architecture
 ## pkg
    - command: 各pkgを初期化
    - config: 設定を管理
