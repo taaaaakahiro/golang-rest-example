@@ -7,24 +7,25 @@ docker-compose version 1.29.2, build 5becea4c
 ```
 
 # setup
-## isntall golang & docker
+## isntall golang & docker(recommend for Mac)
    - go
       - https://go.dev/
    - docker desktop
       - https://www.docker.com/products/docker-desktop/
 
-## run DB *DBコンテナを起動
+## run DB/DBコンテナを起動
 ```sh
 $ docker-compose up -d #DBコンテナ起動
 $ docker-compose down #DBコンテナ停止
 ```
 
-## run app *api serverを起動
+## run app/api serverを起動
 1. setup environment/環境変数を設定(内容は.env.sampleファイル参照)
 ```sh
-$ export PORT=<server port>
-$ export MYSQL_DSN=<mysql dsn>
-$ export ALLOW_CORS_ORIGIN=<cors origin>
+$ cp .env.sample .env
+$ #export PORT=<server port>
+$ #export MYSQL_DSN=<mysql dsn>
+$ #export ALLOW_CORS_ORIGIN=<cors origin>
 ```
 2. command/ローカルでapi serverを起動
 ```sh
@@ -32,9 +33,9 @@ $ make run #go run ./cmd/api/main.go
 ```
 3. check endpoint/ブラウザで動作確認
  - <SERVER PORT>は1.で指定したPORT
-```
-$ localhost:<SERVER PORT>/version #ex. localhost:8080/version
-$ localhost:<SERVER PORT>/healthz
+```sh
+$ localhost:<SERVER PORT>/version #ex  localhost:8080/version
+$ localhost:<SERVER PORT>/healthz #ex localhost:8080/healthz
 ```
 - 画面キャプチャ
    - /version
@@ -42,12 +43,12 @@ $ localhost:<SERVER PORT>/healthz
    - /healthz
       - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D-healthz
 
-# test *goでテストを実行
+# test with linux/goでテストを実行
 ```sh
 $ make test #go test ./...
 ```
 
-# curl/http request
+# curl/http request/HTTPリクエスト(動作確認結果のキャプチャあり)
 ```sh
 $ curl -X GET localhost:8080/version #バージョン確認(動作確認も兼ねています)
 $ curl -X GET localhost:8080/v1/user/{id} -H "Content-Type: application/json" #idを指定して該当のuserを取得
@@ -60,7 +61,8 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
       - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D%E7%94%BB%E9%9D%A2%E3%82%AD%E3%83%A3%E3%83%97%E3%83%81%E3%83%A3
 
 # Architecture
-## pkg
+## DDD/Clean Architecture
+### pkg
    - command: 各pkgを初期化
    - config: 設定を管理
    - domain: 目的の明確化
@@ -70,4 +72,4 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
    - io: DB接続
    - middleware: リクエストの前処理等 
    - server: API Serverの設定
-   - version: バージョン管理
+   - version: toolバージョン管理

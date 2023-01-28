@@ -36,7 +36,8 @@ func (h *Handler) GetUserHandler() http.Handler {
 
 func (h *Handler) ListUsersHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		users, err := h.repo.UserRepository.ListUsers(context.Background())
+		c := r.Context()
+		users, err := h.repo.UserRepository.ListUsers(c)
 		if err != nil {
 			h.logger.Error("failed to get user", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
