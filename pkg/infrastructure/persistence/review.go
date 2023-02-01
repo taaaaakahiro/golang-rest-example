@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
+	derr "github.com/taaaaakahiro/golang-rest-example/pkg/domain/error"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/repository"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/io"
 )
@@ -58,6 +59,9 @@ WHERE
 	}
 	if err = rows.Err(); err != nil {
 		return []*entity.Review{}, errors.WithStack(err)
+	}
+	if len(reviews) == 0 {
+		return []*entity.Review{}, derr.ErrReviewNotFound{}
 	}
 
 	return reviews, nil

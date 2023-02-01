@@ -2,6 +2,8 @@ package persistence
 
 import (
 	"context"
+	"github.com/google/go-cmp/cmp/cmpopts"
+	derr "github.com/taaaaakahiro/golang-rest-example/pkg/domain/error"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -77,7 +79,7 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 			name:    "not exist userId",
 			userID:  999,
 			want:    []*entity.Review{},
-			wantErr: nil,
+			wantErr: derr.ErrReviewNotFound{},
 		},
 	}
 
@@ -85,7 +87,8 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := reviewRepo.ListReview(context.Background(), testDB, tt.userID)
-			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
+			opt := cmpopts.EquateErrors()
+			if diff := cmp.Diff(tt.wantErr, err, opt); len(diff) != 0 {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
 			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
