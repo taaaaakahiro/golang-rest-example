@@ -15,9 +15,13 @@ import (
 const dbname = "example"
 
 var (
-	userRepo   *UserRepository
-	reviewRepo *ReviewRepository
-	testDB     *sql.DB
+	userRepo       *UserRepository
+	reviewRepo     *ReviewRepository
+	testDB         *sql.DB
+	truncateTables = []string{
+		"users",
+		"reviews",
+	}
 )
 
 func TestMain(m *testing.M) {

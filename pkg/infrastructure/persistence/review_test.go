@@ -3,7 +3,9 @@ package persistence
 import (
 	"context"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/stretchr/testify/assert"
 	derr "github.com/taaaaakahiro/golang-rest-example/pkg/domain/error"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/input"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -12,16 +14,6 @@ import (
 )
 
 func TestReviewRepo_ListReviews(t *testing.T) {
-	// CleanUp
-	if err := testfixtures.TruncateTables(testDB, []string{"reviews"}); err != nil {
-		t.Errorf("truncate error: %s\n", err.Error())
-	}
-	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(testDB, []string{"reviews"}); err != nil {
-			t.Errorf("truncate error: %s\n", err.Error())
-		}
-	})
-
 	// Seeds
 	reviews := []struct {
 		id      int
@@ -43,12 +35,6 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 			text:    "text3",
 			user_id: 2,
 		},
-	}
-	// Insert Seeds
-	for _, review := range reviews {
-		if err := testfixtures.InsertTable(testDB, "reviews", interface{}(review)); err != nil {
-			t.Errorf("insert error: %s\n", err.Error())
-		}
 	}
 
 	// TestCase
@@ -84,6 +70,21 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		// CleanUp
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		// Insert Seeds
+		for _, review := range reviews {
+			if err := testfixtures.InsertTable(testDB, "reviews", interface{}(review)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
 
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := reviewRepo.ListReview(context.Background(), testDB, tt.userID)
@@ -97,4 +98,84 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 		})
 	}
 
+}
+
+func TestReviewRepository_TxCreateReview(t *testing.T) {
+	users := []struct {
+		Id   string
+		Name string
+	}{
+		{Id: "1", Name: "user1"},
+		{Id: "2", Name: "user2"},
+	}
+
+	insId1 := 1
+	insId2 := 2
+
+	tests := []struct {
+		name        string
+		inputReview input.Review
+		want        *int
+		wantErr     error
+	}{
+		{
+			name: "ok",
+			inputReview: input.Review{
+				Text:   "text1",
+				UserID: 1,
+			},
+			want:    &insId1,
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			inputReview: input.Review{
+				Text:   "text2",
+				UserID: 2,
+			},
+			want:    &insId2,
+			wantErr: nil,
+		},
+	}
+
+	if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+		t.Errorf("truncate error: %s\n", err.Error())
+	}
+	t.Cleanup(func() {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+	})
+	for _, user := range users {
+		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
+			t.Errorf("insert error: %s\n", err.Error())
+		}
+	}
+
+	for _, tt := range tests {
+
+		c := context.Background()
+
+		t.Run(tt.name, func(t *testing.T) {
+			tx, err := testDB.BeginTx(c, nil)
+			assert.NoError(t, err)
+			defer func() {
+				if err != nil {
+					_ = tx.Rollback()
+				} else {
+					_ = tx.Commit()
+				}
+			}()
+
+			got, err := reviewRepo.TxCreateReview(c, tx, tt.inputReview)
+			opt := cmpopts.EquateErrors()
+			if diff := cmp.Diff(tt.wantErr, err, opt); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+
+		})
+	}
 }
