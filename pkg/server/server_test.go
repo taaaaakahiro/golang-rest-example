@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/service"
 	"net/http/httptest"
 	"os"
 	"testing"
@@ -16,17 +18,19 @@ import (
 
 var (
 	testServer *httptest.Server
-	mysqlDsn   string
+	testDB     *sql.DB
 )
 
 const dbname = "example"
 
 func TestMain(m *testing.M) {
 	// before
-	mysqlDsn = fmt.Sprintf(
+	dsn := fmt.Sprintf(
 		"root:password@tcp(localhost:33061)/%s?charset=utf8&parseTime=true",
 		dbname,
 	)
+	testDB, _ = sql.Open("mysql", dsn)
+
 	logger, _ := zap.NewDevelopment()
 	cfg, _ := config.LoadConfig(context.Background())
 	sqlSetting := &config.SQLDBSettings{
@@ -37,8 +41,9 @@ func TestMain(m *testing.M) {
 	}
 	db, _ := io.NewDatabase(sqlSetting)
 	repo, _ := persistence.NewRepositories(db)
+	services := service.NewService(repo)
 
-	handler := handler.NewHandler(logger, repo, "test")
+	handler := handler.NewHandler(logger, repo, services, "test")
 	server := NewServer(handler, &Config{Log: logger}, cfg)
 	testServer = httptest.NewServer(server.Router)
 

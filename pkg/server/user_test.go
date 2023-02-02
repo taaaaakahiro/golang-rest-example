@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -19,14 +18,12 @@ import (
 const userTable = "users"
 
 func TestServer_GetUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
-
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -41,7 +38,7 @@ func TestServer_GetUser(t *testing.T) {
 	}
 
 	for _, user := range users {
-		if err := testfixtures.InsertTable(db, "users", interface{}(user)); err != nil {
+		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
 			t.Errorf("insert error: %s\n", err.Error())
 		}
 	}
@@ -80,14 +77,12 @@ func TestServer_GetUser(t *testing.T) {
 }
 
 func TestServer_CreateUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
-
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -121,14 +116,12 @@ func TestServer_CreateUser(t *testing.T) {
 }
 
 func TestServer_DeleteUser(t *testing.T) {
-	db, _ := sql.Open("mysql", mysqlDsn)
-
 	// CleanUp
-	if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(db, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -143,7 +136,7 @@ func TestServer_DeleteUser(t *testing.T) {
 	}
 
 	for _, user := range users {
-		if err := testfixtures.InsertTable(db, "users", interface{}(user)); err != nil {
+		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
 			t.Errorf("insert error: %s\n", err.Error())
 		}
 	}
