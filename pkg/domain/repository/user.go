@@ -13,5 +13,5 @@ type IUserRepository interface {
 	CreateUser(ctx context.Context, name string) (*int, error)
 	UpdateUser(ctx context.Context, userID string, name string) error
 	DeleteUser(ctx context.Context, userID string) error
-	TxExistUser(ctx context.Context, tx *sql.Tx, userID string) (bool, error)
+	TxExistUser(ctx context.Context, tx *sql.Tx, userID int) (bool, error)
 }

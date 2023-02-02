@@ -376,25 +376,25 @@ func TestUserRepository_TxExistUser(t *testing.T) {
 	// TestCase
 	tests := []struct {
 		name    string
-		userID  string
+		userID  int
 		want    bool
 		wantErr error
 	}{
 		{
 			name:    "ok",
-			userID:  "1",
+			userID:  1,
 			want:    true,
 			wantErr: nil,
 		},
 		{
 			name:    "ok",
-			userID:  "2",
+			userID:  2,
 			want:    true,
 			wantErr: nil,
 		},
 		{
 			name:    "notExistUserId",
-			userID:  "999",
+			userID:  999,
 			want:    false,
 			wantErr: nil,
 		},

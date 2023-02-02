@@ -152,7 +152,7 @@ WHERE
 	return nil
 }
 
-func (r *UserRepository) TxExistUser(ctx context.Context, tx *sql.Tx, userID string) (bool, error) {
+func (r *UserRepository) TxExistUser(ctx context.Context, tx *sql.Tx, userID int) (bool, error) {
 	query := `
 SELECT EXISTS (
 	SELECT
