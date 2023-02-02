@@ -10,19 +10,7 @@ import (
 	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
 )
 
-const userTable = "users"
-
 func TestUserRepository_GetUser(t *testing.T) {
-	// CleanUp
-	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
-		t.Errorf("truncate error: %s\n", err.Error())
-	}
-	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
-			t.Errorf("truncate error: %s\n", err.Error())
-		}
-	})
-
 	// Fixture
 	users := []struct {
 		Id   string
@@ -30,12 +18,6 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}{
 		{Id: "1", Name: "user1"},
 		{Id: "2", Name: "user2"},
-	}
-
-	for _, user := range users {
-		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
-			t.Errorf("insert error: %s\n", err.Error())
-		}
 	}
 
 	// TestCase
@@ -70,6 +52,20 @@ func TestUserRepository_GetUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		// CleanUp
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		for _, user := range users {
+			if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
 		c := context.Background()
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := userRepo.GetUser(c, tt.userID)
@@ -85,11 +81,11 @@ func TestUserRepository_GetUser(t *testing.T) {
 
 func TestUserRepository_ListUsers(t *testing.T) {
 	// CleanUp
-	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -147,11 +143,11 @@ func TestUserRepository_ListUsers(t *testing.T) {
 func TestUserRepository_CreateUser(t *testing.T) {
 
 	// CleanUp
-	if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+	if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
 	}
 	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 	})
@@ -261,12 +257,12 @@ func TestUserRepository_UpdateUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 
 		t.Cleanup(func() {
-			if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 				t.Errorf("truncate error: %s\n", err.Error())
 			}
 		})
@@ -330,12 +326,12 @@ func TestUserRepository_DeleteUser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 			t.Errorf("truncate error: %s\n", err.Error())
 		}
 
 		t.Cleanup(func() {
-			if err := testfixtures.TruncateTables(testDB, []string{userTable}); err != nil {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 				t.Errorf("truncate error: %s\n", err.Error())
 			}
 		})
@@ -357,6 +353,82 @@ func TestUserRepository_DeleteUser(t *testing.T) {
 				got = &user
 			}
 
+			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestUserRepository_TxExistUser(t *testing.T) {
+	// Fixture
+	users := []struct {
+		Id   string
+		Name string
+	}{
+		{Id: "1", Name: "user1"},
+		{Id: "2", Name: "user2"},
+	}
+
+	// TestCase
+	tests := []struct {
+		name    string
+		userID  string
+		want    bool
+		wantErr error
+	}{
+		{
+			name:    "ok",
+			userID:  "1",
+			want:    true,
+			wantErr: nil,
+		},
+		{
+			name:    "ok",
+			userID:  "2",
+			want:    true,
+			wantErr: nil,
+		},
+		{
+			name:    "notExistUserId",
+			userID:  "999",
+			want:    false,
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		// CleanUp
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		for _, user := range users {
+			if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
+		c := context.Background()
+		t.Run(tt.name, func(t *testing.T) {
+
+			tx, err := testDB.BeginTx(c, nil)
+			assert.NoError(t, err)
+			defer func() {
+				if err != nil {
+					_ = tx.Rollback()
+				} else {
+					_ = tx.Commit()
+				}
+			}()
+
+			got, err := userRepo.TxExistUser(c, tx, tt.userID)
 			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}

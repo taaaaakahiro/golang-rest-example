@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"github.com/pkg/errors"
 
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/repository"
@@ -149,4 +150,28 @@ WHERE
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepository) TxExistUser(ctx context.Context, tx *sql.Tx, userID string) (bool, error) {
+	query := `
+SELECT EXISTS (
+	SELECT
+		*
+	FROM
+	    users
+    WHERE
+        id = ?
+);
+`
+	stmtOut, err := tx.PrepareContext(ctx, query)
+	if err != nil {
+		return false, errors.WithStack(err)
+	}
+	var b bool
+	err = stmtOut.QueryRowContext(ctx, userID).Scan(&b)
+	if err != nil {
+		return false, errors.WithStack(err)
+	}
+
+	return b, nil
 }

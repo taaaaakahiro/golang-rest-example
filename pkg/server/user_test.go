@@ -159,7 +159,7 @@ func TestServer_DeleteUser(t *testing.T) {
 			res, err := client.Do(req)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, res)
-			assert.Equal(t, res.StatusCode, http.StatusNoContent)
+			assert.Equal(t, http.StatusNoContent, res.StatusCode)
 		})
 	})
 }
