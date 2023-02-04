@@ -60,11 +60,15 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 	// v1
 	sr := s.Router.PathPrefix("/v1").Subrouter()
 	{
+		// user
 		sr.Use(mux.CORSMethodMiddleware(s.Router), middleware.CORSHeaderMiddleware(env))
 		sr.Handle("/user/{id}", s.handler.V1.GetUserHandler()).Methods(http.MethodGet, http.MethodOptions)
 		sr.Handle("/users", s.handler.V1.ListUsersHandler()).Methods(http.MethodGet, http.MethodOptions)
 		sr.Handle("/user", s.handler.V1.PostUserHandler()).Methods(http.MethodPost, http.MethodOptions)
 		sr.Handle("/user/{id}", s.handler.V1.DeleteUserHandler()).Methods(http.MethodDelete, http.MethodOptions)
+
+		// review
+		sr.Handle("/review", s.handler.V1.PostReviewHandler()).Methods(http.MethodPost, http.MethodOptions)
 	}
 
 	// common

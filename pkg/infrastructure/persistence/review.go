@@ -24,7 +24,7 @@ func NewReviewRepository(db *io.SQLDatabase) *ReviewRepository {
 	}
 }
 
-func (r *ReviewRepository) ListReview(ctx context.Context, db repository.ContextExecutor, userID int) ([]*entity.Review, error) {
+func (r *ReviewRepository) ListReviews(ctx context.Context, db repository.ContextExecutor, userID int) ([]*entity.Review, error) {
 	query := `
 SELECT
 	id,
@@ -97,4 +97,39 @@ VALUES
 	id := int(insID)
 
 	return &id, nil
+}
+
+func (r *ReviewRepository) GetReview(ctx context.Context, db repository.ContextExecutor, reviewID int) (*entity.Review, error) {
+	query := `
+SELECT
+	id,
+	text,
+	user_id
+FROM
+	reviews
+WHERE
+	id = ?
+	`
+	stmtOut, err := db.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+	defer stmtOut.Close()
+
+	var review entity.Review
+	err = stmtOut.QueryRowContext(ctx, reviewID).Scan(
+		&review.ID,
+		&review.Text,
+		&review.UserID,
+	)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, nil
+		default:
+			return nil, errors.WithStack(err)
+		}
+	}
+
+	return &review, nil
 }

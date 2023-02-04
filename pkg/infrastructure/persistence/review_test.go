@@ -87,7 +87,7 @@ func TestReviewRepo_ListReviews(t *testing.T) {
 		}
 
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := reviewRepo.ListReview(context.Background(), testDB, tt.userID)
+			got, err := reviewRepo.ListReviews(context.Background(), testDB, tt.userID)
 			opt := cmpopts.EquateErrors()
 			if diff := cmp.Diff(tt.wantErr, err, opt); len(diff) != 0 {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -110,7 +110,6 @@ func TestReviewRepository_TxCreateReview(t *testing.T) {
 	}
 
 	insId1 := 1
-	insId2 := 2
 
 	tests := []struct {
 		name        string
@@ -127,32 +126,22 @@ func TestReviewRepository_TxCreateReview(t *testing.T) {
 			want:    &insId1,
 			wantErr: nil,
 		},
-		{
-			name: "ok",
-			inputReview: input.Review{
-				Text:   "text2",
-				UserID: 2,
-			},
-			want:    &insId2,
-			wantErr: nil,
-		},
-	}
-
-	if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
-		t.Errorf("truncate error: %s\n", err.Error())
-	}
-	t.Cleanup(func() {
-		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
-			t.Errorf("truncate error: %s\n", err.Error())
-		}
-	})
-	for _, user := range users {
-		if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
-			t.Errorf("insert error: %s\n", err.Error())
-		}
 	}
 
 	for _, tt := range tests {
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		for _, user := range users {
+			if err := testfixtures.InsertTable(testDB, "users", interface{}(user)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
 
 		c := context.Background()
 
@@ -176,6 +165,79 @@ func TestReviewRepository_TxCreateReview(t *testing.T) {
 				t.Errorf("mismatch (-want +got):\n%s", diff)
 			}
 
+		})
+	}
+}
+
+func TestReviewRepository_GetReview(t *testing.T) {
+	// Seeds
+	reviews := []struct {
+		id      int
+		text    string
+		user_id int
+	}{
+		{
+			id:      1,
+			text:    "text1",
+			user_id: 1,
+		},
+		{
+			id:      2,
+			text:    "text2",
+			user_id: 1,
+		},
+		{
+			id:      3,
+			text:    "text3",
+			user_id: 2,
+		},
+	}
+
+	// TestCase
+	tests := []struct {
+		name    string
+		userID  int
+		want    *entity.Review
+		wantErr error
+	}{
+		{
+			name:   "ok: userId 1",
+			userID: 1,
+			want: &entity.Review{
+				ID:     1,
+				Text:   "text1",
+				UserID: 1,
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		// CleanUp
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		// Insert Seeds
+		for _, review := range reviews {
+			if err := testfixtures.InsertTable(testDB, "reviews", interface{}(review)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := reviewRepo.GetReview(context.Background(), testDB, tt.userID)
+			opt := cmpopts.EquateErrors()
+			if diff := cmp.Diff(tt.wantErr, err, opt); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
 		})
 	}
 }

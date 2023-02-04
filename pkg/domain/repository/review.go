@@ -9,6 +9,7 @@ import (
 )
 
 type IReviewRepository interface {
-	ListReview(ctx context.Context, db ContextExecutor, userID int) ([]*entity.Review, error)
+	ListReviews(ctx context.Context, db ContextExecutor, userID int) ([]*entity.Review, error)
 	TxCreateReview(ctx context.Context, tx *sql.Tx, inputReview input.Review) (*int, error)
+	GetReview(ctx context.Context, db ContextExecutor, reviewID int) (*entity.Review, error)
 }

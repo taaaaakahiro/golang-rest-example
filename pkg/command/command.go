@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/service"
 	"net"
 	"os"
 	"os/signal"
@@ -81,7 +82,10 @@ func run(ctx context.Context) int {
 		return exitErr
 	}
 
-	registry := handler.NewHandler(logger, repositories, version.Version)
+	// Services
+	services := service.NewService(repositories)
+
+	registry := handler.NewHandler(logger, repositories, services, version.Version)
 	httpServer := server.NewServer(registry, &server.Config{Log: logger}, cfg)
 	wg, ctx := errgroup.WithContext(ctx)
 	wg.Go(func() error {
