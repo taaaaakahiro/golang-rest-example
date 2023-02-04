@@ -4,16 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/service"
+	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
+	"go.uber.org/zap"
+	"log"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
-	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
-	"github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
-	"github.com/taaaaakahiro/golang-rest-example/pkg/io"
-	"go.uber.org/zap"
 )
 
 var (
@@ -25,25 +26,57 @@ var (
 	}
 )
 
-const dbname = "example"
+const dbname = "example_server"
+
+var testDSN = fmt.Sprintf(
+	"root:password@tcp(localhost:33061)/%s?charset=utf8mb4&parseTime=True",
+	dbname,
+)
 
 func TestMain(m *testing.M) {
 	// before
-	dsn := fmt.Sprintf(
-		"root:password@tcp(localhost:33061)/%s?charset=utf8&parseTime=true",
-		dbname,
-	)
-	testDB, _ = sql.Open("mysql", dsn)
 
-	logger, _ := zap.NewDevelopment()
-	cfg, _ := config.LoadConfig(context.Background())
+	cfg, err := config.LoadConfig(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	initDB, err := sql.Open("mysql", cfg.DB.DSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = testfixtures.CreateDatabase(dbname, initDB)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	testDB, err = sql.Open("mysql", testDSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = testfixtures.CreateTables(testDB, testfixtures.Path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	sqlSetting := &config.SQLDBSettings{
 		SqlDsn:              cfg.DB.DSN,
 		SqlMaxOpenConns:     cfg.DB.MaxOpenConns,
 		SqlMaxIdleConns:     cfg.DB.MaxIdleConns,
 		SqlConnsMaxLifetime: cfg.DB.ConnsMaxLifetime,
 	}
-	db, _ := io.NewDatabase(sqlSetting)
+
+	db, err := testfixtures.TestDatabase(sqlSetting, testDSN)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	repo, _ := persistence.NewRepositories(db)
 	services := service.NewService(repo)
 
@@ -53,6 +86,11 @@ func TestMain(m *testing.M) {
 
 	res := m.Run()
 	// after
+
+	err = testfixtures.DropDatabase(dbname, testDB)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	os.Exit(res)
 }

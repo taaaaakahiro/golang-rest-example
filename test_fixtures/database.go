@@ -6,12 +6,20 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
 	"strings"
 	"time"
 
 	errs "github.com/pkg/errors"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/io"
+)
+
+var (
+	testDBs       = make(map[string]*io.SQLDatabase)
+	_, file, _, _ = runtime.Caller(0)
+	Path          = filepath.Join(filepath.Dir(file), "/1_ddl.sql")
 )
 
 func CreateDatabase(dbName string, testDB *sql.DB) error {
@@ -117,6 +125,7 @@ func CreateTables(testDB *sql.DB, path string) error {
 		if err != nil {
 			fmt.Println(err)
 		}
+
 	}
 	_, err = testDB.Exec(ddl)
 	if err != nil {
@@ -171,4 +180,34 @@ func camelToSnake(s string) string {
 
 	snake = strings.ToLower(snake)
 	return snake
+}
+
+func TestDatabase(setting io.MySQLSettings, testDSN string) (*io.SQLDatabase, error) {
+	if db, ok := testDBs[testDSN]; ok {
+		return db, nil
+	}
+
+	db, err := sql.Open("mysql", testDSN)
+	if err != nil {
+		return nil, errs.WithStack(err)
+	}
+
+	// check config
+	if setting.MaxOpenConns() <= 0 {
+		return nil, errs.WithStack(errs.New("require set max open conns"))
+	}
+	if setting.MaxIdleConns() <= 0 {
+		return nil, errs.WithStack(errs.New("require set max idle conns"))
+	}
+	if setting.ConnsMaxLifetime() <= 0 {
+		return nil, errs.WithStack(errs.New("require set conns max lifetime"))
+	}
+	db.SetMaxOpenConns(setting.MaxOpenConns())
+	db.SetMaxIdleConns(setting.MaxIdleConns())
+	db.SetConnMaxLifetime(time.Duration(setting.ConnsMaxLifetime()) * time.Second)
+
+	testDB := &io.SQLDatabase{Database: db}
+	testDBs[testDSN] = testDB
+
+	return testDB, nil
 }
