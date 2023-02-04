@@ -13,12 +13,12 @@ type Config struct {
 }
 
 type serverConfig struct {
-	Port            int    `env:"PORT,required"`
+	Port            int    `env:"PORT,default=8080"`
 	AllowCorsOrigin string `env:"ALLOW_CORS_ORIGIN,default=*"`
 }
 
 type databaseConfig struct {
-	DSN              string `env:"MYSQL_DSN,required"`
+	DSN              string `env:"MYSQL_DSN,default=root:password@tcp(localhost:33061)/example?charset=utf8&parseTime=true"`
 	MaxOpenConns     int    `env:"MAX_OPEN_CONNS,default=100"`
 	MaxIdleConns     int    `env:"MAX_IDLE_CONNS,default=100"`
 	ConnsMaxLifetime int    `env:"CONNS_MAX_LIFETIME,default=100"`
