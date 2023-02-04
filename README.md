@@ -21,22 +21,21 @@ $ docker-compose down #DBコンテナ停止
 
 ## run app/api serverを起動
 1. setup environment/環境変数を設定(内容は.env.sampleファイル参照)
-```sh
-$ cp .env.sample .env
-$ #export PORT=<server port>
-$ #export MYSQL_DSN=<mysql dsn>
-$ #export ALLOW_CORS_ORIGIN=<cors origin>
-```
+    ```sh
+    $ export PORT=<server port>
+    $ export MYSQL_DSN=<mysql dsn>
+    $ export ALLOW_CORS_ORIGIN=<cors origin>
+    ```
 2. command/ローカルでapi serverを起動
-```sh
-$ make run #go run ./cmd/api/main.go
-```
+    ```sh
+    $ make run #go run ./cmd/api/main.go
+    ```
 3. check endpoint/ブラウザで動作確認
  - <SERVER PORT>は1.で指定したPORT
-```sh
-$ localhost:<SERVER PORT>/version #ex  localhost:8080/version
-$ localhost:<SERVER PORT>/healthz #ex localhost:8080/healthz
-```
+    ```sh
+    $ localhost:<SERVER PORT>/version #ex  localhost:8080/version
+    $ localhost:<SERVER PORT>/healthz #ex localhost:8080/healthz
+    ```
 - 画面キャプチャ
    - /version
       - https://github.com/taaaaakahiro/golang-rest-example/wiki/%5B%E5%8B%95%E4%BD%9C%E7%A2%BA%E8%AA%8D%5D--version
@@ -67,9 +66,10 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
    - config: 設定を管理
    - domain: 目的の明確化
    - handler: ルーティング
-   - infrastractue
+   - infrastructure
       - persistence: クエリ
    - io: DB接続
    - middleware: リクエストの前処理等 
+   - service: 複数のUseCaseを纏める
    - server: API Serverの設定
    - version: toolバージョン管理
