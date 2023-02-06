@@ -74,6 +74,7 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 	// common
 	s.Router.HandleFunc("/healthz", s.healthCheckHandler).Methods(http.MethodGet)
 	s.Router.HandleFunc("/version", s.handler.Version.GetVersion).Methods(http.MethodGet)
+	s.Router.HandleFunc("/index", s.handler.Template.IndexTemplateHandler).Methods(http.MethodGet)
 
 }
 

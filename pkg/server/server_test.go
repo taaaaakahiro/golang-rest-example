@@ -7,6 +7,7 @@ import (
 	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/service"
+	htmlTmp "github.com/taaaaakahiro/golang-rest-example/template"
 	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
 	"go.uber.org/zap"
 	"log"
@@ -80,7 +81,9 @@ func TestMain(m *testing.M) {
 	repo, _ := persistence.NewRepositories(db)
 	services := service.NewService(repo)
 
-	handler := handler.NewHandler(logger, repo, services, "test")
+	templates := htmlTmp.NewTemplate()
+
+	handler := handler.NewHandler(logger, repo, services, templates, "test")
 	server := NewServer(handler, &Config{Log: logger}, cfg)
 	testServer = httptest.NewServer(server.Router)
 
