@@ -73,3 +73,7 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
    - service: 複数のUseCaseを纏める
    - server: API Serverの設定
    - version: toolバージョン管理
+
+# 追加予定の機能
+ - csvインポート
+ - ファイルアップロード
