@@ -18,6 +18,8 @@ import (
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 )
 
+const dbname = "example_server"
+
 var (
 	testServer     *httptest.Server
 	testDB         *sql.DB
@@ -25,13 +27,10 @@ var (
 		"users",
 		"reviews",
 	}
-)
-
-const dbname = "example_server"
-
-var testDSN = fmt.Sprintf(
-	"root:password@tcp(localhost:33061)/%s?charset=utf8mb4&parseTime=True",
-	dbname,
+	testDSN = fmt.Sprintf(
+		"root:password@tcp(localhost:33061)/%s?charset=utf8mb4&parseTime=True",
+		dbname,
+	)
 )
 
 func TestMain(m *testing.M) {

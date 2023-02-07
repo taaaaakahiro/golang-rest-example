@@ -66,6 +66,6 @@ jobs:
           PORT: 8080
           MAX_OPEN_CONNS: 30
           MAX_IDLE_CONNS: 30
-          MYSQL_DATABASE: ibl
-          MYSQL_DSN: root:password@tcp(localhost:33061)/ibl?charset=utf8mb4&parseTime=True
+          MYSQL_DATABASE: example
+          MYSQL_DSN: root:password@tcp(localhost:33061)/example?charset=utf8mb4&parseTime=True
           ALLOW_CORS_ORIGIN: "*"
