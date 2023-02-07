@@ -7,6 +7,7 @@ import (
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/infrastructure/persistence"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/io"
+	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
 	"log"
 	"os"
 	"testing"
@@ -40,6 +41,11 @@ func TestMain(m *testing.M) {
 	if err := testDB.Ping(); err != nil {
 		log.Fatal(err)
 	}
+	err := testfixtures.CreateTables(testDB, testfixtures.Path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	db, _ := io.NewDatabase(sqlSetting)
 	r, _ := persistence.NewRepositories(db)
 	services = NewService(r)

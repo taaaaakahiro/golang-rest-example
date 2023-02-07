@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	testfixtures "github.com/taaaaakahiro/golang-rest-example/test_fixtures"
 	"log"
 	"os"
 	"testing"
@@ -40,6 +41,10 @@ func TestMain(m *testing.M) {
 	)
 	testDB, _ = sql.Open("mysql", mysqlDsn)
 	if err := testDB.Ping(); err != nil {
+		log.Fatal(err)
+	}
+	err := testfixtures.CreateTables(testDB, testfixtures.Path)
+	if err != nil {
 		log.Fatal(err)
 	}
 
