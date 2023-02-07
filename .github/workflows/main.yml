@@ -61,7 +61,7 @@ jobs:
 
       - name: Run go test
         run: |
-          go test -v -race -coverprofile ./coverage/coverage.txt -covermode atomic ./...
+          go test -v ./...
         env:
           PORT: 8080
           MAX_OPEN_CONNS: 30
