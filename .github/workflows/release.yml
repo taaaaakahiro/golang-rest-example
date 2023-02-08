@@ -100,6 +100,6 @@ jobs:
       - name: Build And Push ECR
         run: |
           docker build -t ecr-practice .
-          docker tag ecr-practice:latest 413937037843.dkr.ecr.ap-northeast-1.amazonaws.com/ecr-practice:latest
-          docker push 413937037843.dkr.ecr.ap-northeast-1.amazonaws.com/ecr-practice:latest
+          docker tag ecr-practice:latest ${{ secrets.ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/ecr-practice:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.ap-northeast-1.amazonaws.com/ecr-practice:latest
           
