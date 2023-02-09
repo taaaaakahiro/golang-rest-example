@@ -1,5 +1,8 @@
 run:
 	go run ./cmd/api/main.go
 
-test:
+clean:
+	go clean -testcache
+
+test: clean
 	go test ./...
