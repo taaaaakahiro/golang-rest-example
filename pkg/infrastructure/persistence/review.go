@@ -3,11 +3,10 @@ package persistence
 import (
 	"context"
 	"database/sql"
-	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/input"
-
 	"github.com/pkg/errors"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
 	derr "github.com/taaaaakahiro/golang-rest-example/pkg/domain/error"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/input"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/repository"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/io"
 )
@@ -132,4 +131,51 @@ WHERE
 	}
 
 	return &review, nil
+}
+
+func (r *ReviewRepository) ListReviewsByLimitAndOffset(ctx context.Context, db repository.ContextExecutor, limit int, offset int) ([]*entity.Review, error) {
+	query := `
+SELECT
+    id,
+    text,
+    user_id
+FROM
+    reviews
+ORDER BY id
+LIMIT ?
+OFFSET ?
+;
+`
+
+	stmtOut, err := db.PrepareContext(ctx, query)
+	if err != nil {
+		return []*entity.Review{}, errors.WithStack(err)
+	}
+
+	rows, err := stmtOut.QueryContext(ctx, limit, offset)
+	if err != nil {
+		return []*entity.Review{}, errors.WithStack(err)
+	}
+	reviews := make([]*entity.Review, 0)
+	for rows.Next() {
+		var review entity.Review
+		err = rows.Scan(
+			&review.ID,
+			&review.Text,
+			&review.UserID,
+		)
+		if err != nil {
+			return []*entity.Review{}, errors.WithStack(err)
+		}
+		reviews = append(reviews, &review)
+	}
+
+	if err = rows.Err(); err != nil {
+		return []*entity.Review{}, errors.WithStack(err)
+	}
+	if len(reviews) == 0 {
+		return []*entity.Review{}, sql.ErrNoRows
+	}
+
+	return reviews, nil
 }

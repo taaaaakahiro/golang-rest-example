@@ -241,3 +241,136 @@ func TestReviewRepository_GetReview(t *testing.T) {
 		})
 	}
 }
+
+func TestReviewRepository_ListReviewsByLimitAndOffset(t *testing.T) {
+	// Seeds
+	reviews := []struct {
+		id      int
+		text    string
+		user_id int
+	}{
+		{id: 1, text: "text1", user_id: 1},
+		{id: 2, text: "text2", user_id: 2},
+		{id: 3, text: "text3", user_id: 3},
+		{id: 4, text: "text4", user_id: 4},
+	}
+
+	type args struct {
+		limit  int
+		offset int
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    []*entity.Review
+		wantErr error
+	}{
+		{
+			name: "ok",
+			args: args{
+				limit:  1,
+				offset: 0,
+			},
+			want: []*entity.Review{
+				{ID: 1, Text: "text1", UserID: 1},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			args: args{
+				limit:  2,
+				offset: 0,
+			},
+			want: []*entity.Review{
+				{ID: 1, Text: "text1", UserID: 1},
+				{ID: 2, Text: "text2", UserID: 2},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			args: args{
+				limit:  1,
+				offset: 1,
+			},
+			want: []*entity.Review{
+				{ID: 2, Text: "text2", UserID: 2},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			args: args{
+				limit:  2,
+				offset: 2,
+			},
+			want: []*entity.Review{
+				{ID: 3, Text: "text3", UserID: 3},
+				{ID: 4, Text: "text4", UserID: 4},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			args: args{
+				limit:  4,
+				offset: 0,
+			},
+			want: []*entity.Review{
+				{ID: 1, Text: "text1", UserID: 1},
+				{ID: 2, Text: "text2", UserID: 2},
+				{ID: 3, Text: "text3", UserID: 3},
+				{ID: 4, Text: "text4", UserID: 4},
+			},
+			wantErr: nil,
+		},
+		{
+			name: "ok",
+			args: args{
+				limit:  4,
+				offset: 1,
+			},
+			want: []*entity.Review{
+				{ID: 2, Text: "text2", UserID: 2},
+				{ID: 3, Text: "text3", UserID: 3},
+				{ID: 4, Text: "text4", UserID: 4},
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		// CleanUp
+		if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+			t.Errorf("truncate error: %s\n", err.Error())
+		}
+		t.Cleanup(func() {
+			if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
+				t.Errorf("truncate error: %s\n", err.Error())
+			}
+		})
+		// Insert Seeds
+		for _, review := range reviews {
+			if err := testfixtures.InsertTable(testDB, "reviews", interface{}(review)); err != nil {
+				t.Errorf("insert error: %s\n", err.Error())
+			}
+		}
+
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := reviewRepo.ListReviewsByLimitAndOffset(
+				context.Background(),
+				testDB,
+				tt.args.limit,
+				tt.args.offset,
+			)
+			if diff := cmp.Diff(tt.wantErr, err); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tt.want, got); len(diff) != 0 {
+				t.Errorf("mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
