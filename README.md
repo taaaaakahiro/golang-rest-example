@@ -7,11 +7,13 @@ docker-compose version 1.29.2, build 5becea4c
 ```
 
 # setup
-## isntall golang & docker(recommend for Mac)
+## install
    - go
       - https://go.dev/
    - docker desktop
       - https://www.docker.com/products/docker-desktop/
+   - direnv(macの場合)
+     - https://qiita.com/toshichanapp/items/c5d76144bf6938207f4e
 
 ## run DB/DBコンテナを起動
 ```sh
@@ -22,19 +24,18 @@ $ docker-compose down #DBコンテナ停止
 ## run app/api serverを起動
 1. setup environment/環境変数を設定(内容は.env.sampleファイル参照)
     ```sh
-    $ export PORT=<server port>
-    $ export MYSQL_DSN=<mysql dsn>
-    $ export ALLOW_CORS_ORIGIN=<cors origin>
+    $ export PORT=<PORT>
+    $ export MYSQL_DSN=<MYSQL_DSN>
+    $ export ALLOW_CORS_ORIGIN=<ALLOW_CORS_ORIGIN>
     ```
 2. command/ローカルでapi serverを起動
     ```sh
     $ make run #go run ./cmd/api/main.go
     ```
 3. check endpoint/ブラウザで動作確認
- - <SERVER PORT>は1.で指定したPORT
     ```sh
-    $ localhost:<SERVER PORT>/version #ex  localhost:8080/version
-    $ localhost:<SERVER PORT>/healthz #ex localhost:8080/healthz
+    $ localhost:<PORT>/version #ex  localhost:8080/version
+    $ localhost:<PORT>/healthz #ex localhost:8080/healthz
     ```
 - 画面キャプチャ
    - /version
