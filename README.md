@@ -76,5 +76,8 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
    - version: toolバージョン管理
 
 # 追加予定の機能
- - csvインポート
- - ファイルアップロード
+ - [ ] csvインポート
+ - [ ] csvエクスポート
+ - [ ] ファイルアップロード
+ - [ ] メール送信
+ - [ ] gorilla → chi
