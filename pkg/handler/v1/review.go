@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-func (h *Handler) PostReviewHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) PostReviewHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		var input input.Review
 		decode := json.NewDecoder(req.Body)
@@ -45,5 +45,5 @@ func (h *Handler) PostReviewHandler() http.Handler {
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(b))
-	})
+	}
 }

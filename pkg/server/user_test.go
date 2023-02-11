@@ -48,13 +48,10 @@ func TestServer_GetUser(t *testing.T) {
 			id string
 		}
 
-		t.Run("ok", func(t *testing.T) {
-			r := inputUser{
-				id: "1",
-			}
-			b, _ := json.Marshal(r)
-
-			req, err := http.NewRequest("GET", testServer.URL+`/v1/user/1`, bytes.NewReader(b))
+		t.Run("ok: id 1", func(t *testing.T) {
+			id := 1
+			ep := fmt.Sprintf("%s/v1/user/%d", testServer.URL, id)
+			req, err := http.NewRequest("GET", ep, nil)
 			assert.NoError(t, err)
 			req.Header.Set("Content-Type", "application/json")
 

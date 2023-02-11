@@ -3,20 +3,19 @@ package v1
 import (
 	"context"
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/input"
 
 	"go.uber.org/zap"
 )
 
-func (h *Handler) GetUserHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id := vars["id"]
-		user, err := h.repo.UserRepository.GetUser(context.Background(), id)
+func (h *Handler) GetUserHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := chi.URLParam(r, "userID")
+		user, err := h.repo.UserRepository.GetUser(context.Background(), userID)
 		if err != nil {
 			h.logger.Error("failed to get user", zap.Error(err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -31,11 +30,11 @@ func (h *Handler) GetUserHandler() http.Handler {
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(b)
-	})
+	}
 }
 
-func (h *Handler) ListUsersHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ListUsersHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		c := r.Context()
 		users, err := h.repo.UserRepository.ListUsers(c)
 		if err != nil {
@@ -52,11 +51,11 @@ func (h *Handler) ListUsersHandler() http.Handler {
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(b)
-	})
+	}
 }
 
-func (h *Handler) PostUserHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) PostUserHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
 		var user input.User
 		decode := json.NewDecoder(req.Body)
 		err := decode.Decode(&user)
@@ -88,14 +87,13 @@ func (h *Handler) PostUserHandler() http.Handler {
 
 		w.WriteHeader(http.StatusOK)
 		w.Write(byte)
-	})
+	}
 }
 
-func (h *Handler) DeleteUserHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		vars := mux.Vars(req)
-		id := vars["id"]
-		err := h.repo.UserRepository.DeleteUser(context.Background(), id)
+func (h *Handler) DeleteUserHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		userID := chi.URLParam(req, "userID")
+		err := h.repo.UserRepository.DeleteUser(context.Background(), userID)
 		if err != nil {
 			log.Printf("failed to create user (error:%s)", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -103,5 +101,5 @@ func (h *Handler) DeleteUserHandler() http.Handler {
 		}
 
 		w.WriteHeader(http.StatusNoContent)
-	})
+	}
 }

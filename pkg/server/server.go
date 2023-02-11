@@ -2,18 +2,17 @@ package server
 
 import (
 	"context"
+	"github.com/go-chi/chi/v5"
 	"net"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
-	"github.com/taaaaakahiro/golang-rest-example/pkg/middleware"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	Router  *mux.Router
+	Router  *chi.Mux
 	server  *http.Server
 	handler *handler.Handler
 	log     *zap.Logger
@@ -25,7 +24,7 @@ type Config struct {
 
 func NewServer(registry *handler.Handler, cfg *Config, env *config.Config) *Server {
 	s := &Server{
-		Router:  mux.NewRouter(),
+		Router:  chi.NewRouter(),
 		handler: registry,
 	}
 
@@ -57,24 +56,29 @@ func (s *Server) GracefulShutdown(ctx context.Context) error {
 
 func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 
-	// v1
-	sr := s.Router.PathPrefix("/v1").Subrouter()
-	{
-		// user
-		sr.Use(mux.CORSMethodMiddleware(s.Router), middleware.CORSHeaderMiddleware(env))
-		sr.Handle("/user/{id}", s.handler.V1.GetUserHandler()).Methods(http.MethodGet, http.MethodOptions)
-		sr.Handle("/users", s.handler.V1.ListUsersHandler()).Methods(http.MethodGet, http.MethodOptions)
-		sr.Handle("/user", s.handler.V1.PostUserHandler()).Methods(http.MethodPost, http.MethodOptions)
-		sr.Handle("/user/{id}", s.handler.V1.DeleteUserHandler()).Methods(http.MethodDelete, http.MethodOptions)
+	s.Router.Route("/", func(r chi.Router) {
+		r.Get("/healthz", s.healthCheckHandler)
+		r.Get("/version", s.handler.Version.GetVersion)
+		r.Get("/index", s.handler.Template.IndexTemplateHandler)
 
-		// review
-		sr.Handle("/review", s.handler.V1.PostReviewHandler()).Methods(http.MethodPost, http.MethodOptions)
-	}
+		// v1
+		s.Router.Route("/v1", func(r chi.Router) {
+			// user
+			r.Route("/user", func(r chi.Router) {
+				r.Get("/{userID}", s.handler.V1.GetUserHandler())
+				r.Get("/all", s.handler.V1.ListUsersHandler())
+				r.Post("/", s.handler.V1.PostUserHandler())
+				r.Delete("/{userID}", s.handler.V1.DeleteUserHandler())
+			})
 
-	// common
-	s.Router.HandleFunc("/healthz", s.healthCheckHandler).Methods(http.MethodGet)
-	s.Router.HandleFunc("/version", s.handler.Version.GetVersion).Methods(http.MethodGet)
-	s.Router.HandleFunc("/index", s.handler.Template.IndexTemplateHandler).Methods(http.MethodGet)
+			// review
+			r.Route("/review", func(r chi.Router) {
+				r.Post("/", s.handler.V1.PostReviewHandler())
+			})
+
+		})
+
+	})
 
 }
 
