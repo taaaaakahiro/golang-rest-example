@@ -3,11 +3,14 @@ package server
 import (
 	"context"
 	"github.com/go-chi/chi/v5"
+	chiMiddlleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"net"
 	"net/http"
 
 	"github.com/taaaaakahiro/golang-rest-example/pkg/config"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/handler"
+	"github.com/taaaaakahiro/golang-rest-example/pkg/middleware"
 	"go.uber.org/zap"
 )
 
@@ -56,6 +59,7 @@ func (s *Server) GracefulShutdown(ctx context.Context) error {
 
 func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 
+	s.Router.Use(chiMiddlleware.Logger)
 	s.Router.Route("/", func(r chi.Router) {
 		r.Get("/healthz", s.healthCheckHandler)
 		r.Get("/version", s.handler.Version.GetVersion)
@@ -63,6 +67,17 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 
 		// v1
 		s.Router.Route("/v1", func(r chi.Router) {
+			// 自作の場合
+			r.Use(middleware.CORSHeaderMiddleware(env))
+			// chi-corsの場合
+			r.Use(cors.Handler(cors.Options{
+				AllowedOrigins: []string{"*"}, // Use this to allow specific origin hosts
+				//AllowedOrigins: []string{"https://*", "http://*"},
+				AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+				//AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"}, //CORSHeaderMiddlewareで設定
+				AllowCredentials: true,
+			}))
+
 			// user
 			r.Route("/user", func(r chi.Router) {
 				r.Get("/{userID}", s.handler.V1.GetUserHandler())
