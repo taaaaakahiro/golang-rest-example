@@ -81,4 +81,4 @@ $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json"
  - [ ] csvエクスポート
  - [ ] ファイルアップロード
  - [ ] メール送信
- - [ ] gorilla → chi
+ - [X] gorilla → chi 2023/2/11 up
