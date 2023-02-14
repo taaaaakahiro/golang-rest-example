@@ -89,6 +89,7 @@ func (s *Server) registerHandler(env *config.Config, cnf *Config) {
 			// review
 			r.Route("/review", func(r chi.Router) {
 				r.Post("/", s.handler.V1.PostReviewHandler())
+				r.Get("/", s.handler.V1.ListReviewsHandler())
 			})
 
 		})

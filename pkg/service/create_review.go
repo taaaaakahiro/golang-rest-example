@@ -19,7 +19,7 @@ func NewReviewService(r *persistence.Repositories) *ReviewService {
 }
 
 func (s *ReviewService) Create(ctx context.Context, inputReview input.Review) (*int, error) {
-	tx, cancel, err := s.repo.DB.Begin()
+	tx, cancel, err := s.repo.DB().Begin()
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
