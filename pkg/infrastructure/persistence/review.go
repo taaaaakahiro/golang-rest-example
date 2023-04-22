@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+
 	"github.com/pkg/errors"
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
 	derr "github.com/taaaaakahiro/golang-rest-example/pkg/domain/error"
@@ -151,11 +152,13 @@ OFFSET ?
 	if err != nil {
 		return []*entity.Review{}, errors.WithStack(err)
 	}
+	defer stmtOut.Close()
 
 	rows, err := stmtOut.QueryContext(ctx, limit, offset)
 	if err != nil {
 		return []*entity.Review{}, errors.WithStack(err)
 	}
+	defer rows.Close()
 	reviews := make([]*entity.Review, 0)
 	for rows.Next() {
 		var review entity.Review

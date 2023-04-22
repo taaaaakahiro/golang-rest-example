@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+
 	"github.com/pkg/errors"
 
 	"github.com/taaaaakahiro/golang-rest-example/pkg/domain/entity"
@@ -36,6 +37,8 @@ func (r *UserRepository) GetUser(ctx context.Context, userID string) (*entity.Us
 	if err != nil {
 		return nil, err
 	}
+	defer stmtOut.Close()
+
 	var user entity.User
 	err = stmtOut.QueryRowContext(ctx, userID).Scan(&user.ID, &user.Name)
 	if err != nil {
@@ -66,6 +69,7 @@ func (r *UserRepository) ListUsers(ctx context.Context) ([]*entity.User, error) 
 	if err != nil {
 		return []*entity.User{}, err
 	}
+	defer stmtOut.Close()
 
 	users := make([]*entity.User, 0)
 	for rows.Next() {
@@ -93,6 +97,8 @@ VALUE (?)
 	if err != nil {
 		return nil, err
 	}
+	defer stmtOut.Close()
+
 	result, err := stmtOut.ExecContext(ctx, name)
 	if err != nil {
 		return nil, err
@@ -119,6 +125,8 @@ WHERE
 	if err != nil {
 		return err
 	}
+	defer stmtOut.Close()
+
 	result, err := stmtOut.ExecContext(ctx, name, userID)
 	if err != nil {
 		return err
@@ -141,6 +149,8 @@ WHERE
 	if err != nil {
 		return err
 	}
+	defer stmtOut.Close()
+
 	result, err := stmtOut.ExecContext(ctx, userID)
 	if err != nil {
 		return err
@@ -167,6 +177,8 @@ SELECT EXISTS (
 	if err != nil {
 		return false, errors.WithStack(err)
 	}
+	defer stmtOut.Close()
+
 	var b bool
 	err = stmtOut.QueryRowContext(ctx, userID).Scan(&b)
 	if err != nil {

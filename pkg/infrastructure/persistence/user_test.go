@@ -141,7 +141,6 @@ func TestUserRepository_ListUsers(t *testing.T) {
 }
 
 func TestUserRepository_CreateUser(t *testing.T) {
-
 	// CleanUp
 	if err := testfixtures.TruncateTables(testDB, truncateTables); err != nil {
 		t.Errorf("truncate error: %s\n", err.Error())
