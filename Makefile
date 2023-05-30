@@ -1,4 +1,4 @@
-run: fmt
+run: vet
 	go run ./cmd/api/main.go
 
 clean:
@@ -9,3 +9,6 @@ test: clean
 
 fmt:
 	go fmt ./...
+
+vet: fmt
+	go vet ./...
