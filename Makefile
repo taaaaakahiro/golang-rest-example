@@ -1,4 +1,4 @@
-run:
+run: fmt
 	go run ./cmd/api/main.go
 
 clean:
@@ -6,3 +6,6 @@ clean:
 
 test: clean
 	go test ./...
+
+fmt:
+	go fmt ./...
