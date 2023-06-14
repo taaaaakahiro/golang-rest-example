@@ -55,6 +55,7 @@ $ curl -X GET localhost:8080/v1/user/{id} -H "Content-Type: application/json" #i
 $ curl -X GET localhost:8080/v1/user/all -H "Content-Type: application/json" #userテーブルの一覧(全件)を取得
 $ curl -X POST localhost:8080/v1/user -H "Content-Type: application/json" --data-raw '{"name": "user"}' #usersテーブルに指定したnameのuserレコードを追加
 $ curl -X DELETE localhost:8080/v1/user/{id} -H "Content-Type: application/json" #idを指定して該当のuserをテーブルから削除
+$ curl -X POST localhost:8080/v1/review -H "Content-Type: application/json" --data-raw '{"user_id": 1,"text":"xyz"}' #reviewsテーブルへ登録 ※指定のuser_idがusersテーブルにあること、user_idは数値(文字列だと型が合わない&リクエストするデータは空白なし)
 
 ```
    - 画面キャプチャ
