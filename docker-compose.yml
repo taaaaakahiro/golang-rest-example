@@ -2,7 +2,7 @@ services:
   # MySQL
   db:
     image: mysql:8.0
-    container_name: mysql_host_for_golang
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: example
@@ -16,3 +16,18 @@ services:
     - ./mock/ddl:/docker-entrypoint-initdb.d
     ports:
       - 33061:3306
+
+  mongo:
+    image: mongo:7.0.2
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: example
+    ports:
+      - 27017:27017
+#    volumes:
+#      - ./mock/mongo/initdb.d:/docker-entrypoint-initdb.d
+      # - ./mongo:/data/db
+      # - ./mongo:/data/configdb
