@@ -1,7 +1,7 @@
 services:
   # MySQL
   db:
-    image: mysql:8.0
+    image: mysql:8.3
     container_name: mysql_host_for_golang
     environment:
       MYSQL_ROOT_PASSWORD: password
